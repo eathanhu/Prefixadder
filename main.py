@@ -52,8 +52,7 @@ def main():
 
     app.add_handler(CommandHandler("ping", ping))
     app.add_handler(
-        MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message)
-    )
+        MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
     print("Bot is running...")
     app.run_polling()
