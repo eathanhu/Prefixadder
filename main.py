@@ -8,7 +8,6 @@ from telegram.ext import (
     filters,
 )
 
-# ⚠️ Token kept as requested
 BOT_TOKEN = "7605778799:AAGcm7clfAliM1NLDk3jt6mUAW5rxwd9pPs"
 
 # Simple domain regex
@@ -17,7 +16,6 @@ LINK_REGEX = re.compile(
 )
 
 async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Works in groups only
     if update.message.chat.type == "private":
         return
 
@@ -28,15 +26,15 @@ async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.message
 
-    # 1️⃣ Ignore DMs
+    # Ignore private chats
     if message.chat.type == "private":
         return
 
-    # 2️⃣ Must be a reply
+    # Must be a reply
     if not message.reply_to_message:
         return
 
-    # 3️⃣ Must be a reply to the bot
+    # Must be a reply to the bot
     if message.reply_to_message.from_user.id != context.bot.id:
         return
 
@@ -62,11 +60,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    )
-
-    print("Bot is running...")
-    app.run_polling()
-
-if __name__ == "__main__":
-    main()
-  
+    
