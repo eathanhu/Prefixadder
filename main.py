@@ -10,12 +10,15 @@ from telegram.ext import (
 
 BOT_TOKEN = "7605778799:AAGcm7clfAliM1NLDk3jt6mUAW5rxwd9pPs"
 
-# Simple domain regex
 LINK_REGEX = re.compile(
     r"^(?:https?://)?(?:www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$"
 )
 
 async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # Ignore non-message updates
+    if not update.message:
+        return
+
     if update.message.chat.type == "private":
         return
 
@@ -24,6 +27,10 @@ async def ping(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # 🔑 FIX: ignore updates without messages
+    if not update.message:
+        return
+
     message = update.message
 
     # Ignore private chats
@@ -34,6 +41,31 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not message.reply_to_message:
         return
 
+    # Must be a reply to the bot
+    if message.reply_to_message.from_user.id != context.bot.id:
+        return
+
+    text = message.text.strip()
+
+    if LINK_REGEX.match(text):
+        if not text.startswith(("http://", "https://")):
+            text = "https://" + text
+        await message.reply_text(text)
+    else:
+        await message.reply_text("❌ Invalid: it is not a link")
+
+def main():
+    app = ApplicationBuilder().token(BOT_TOKEN).build()
+
+    app.add_handler(CommandHandler("ping", ping))
+    app.add_handler(
+        MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+
+    print("Bot is running...")
+    app.run_polling()
+
+if __name__ == "__main__":
+    main()
     # Must be a reply to the bot
     if message.reply_to_message.from_user.id != context.bot.id:
         return
